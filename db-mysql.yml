@@ -1,0 +1,66 @@
+---
+- name: setup Mysql with medium_db db and remote login
+  hosts: server
+
+  tasks:
+    - name: Ansible apt-get to get install mysql
+      become: true
+      apt:
+        name:
+          - python3-pip
+          - mysql-server
+        state: present
+        force_apt_get: yes
+
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+        
+    - name: Set the root password
+      become: true
+      mysql_user:
+        login_user: root
+        login_password: 1
+        user: root
+        password: 1
+        host: localhost
+        check_implicit_admin: yes
+      tags: mysql
+
+    - name: creating medium_db
+      become: true
+      mysql_db:
+        login_user: root
+        login_password: 1
+        db: bd_test
+        state: present
+      tags: mysql
+
+    # - name: Removes the test database
+    #   mysql_db:
+    #     login_user: root
+    #     login_password: "{{ mysql_root_password }}"
+    #     db: test
+    #     state: absent
+    #   tags: mysql
+
+    # - name: Create a list of databases with encoding as utf-8
+    #   mysql_db:
+    #     login_user: root
+    #     login_password: "{{ mysql_root_password }}"
+    #     name: '{{ item }}'
+    #     state: present
+    #     encoding: utf8
+    #   with_items:
+    #     - "amon"
+    #     - "scm"
+    #     - "rman"
+    #     - "metastore"
+    #     - "nav"
+    #     - "hue"
+    #     - "navms"
+    #     - "sentry"
+    #     - "oozie"
+    #   tags: mysql_db_create
