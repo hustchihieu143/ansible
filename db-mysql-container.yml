@@ -1,0 +1,27 @@
+---
+- name: setup mysql by container
+  hosts: server
+
+  vars:
+    docker_volume: db_data
+    docker_network: ansible_net
+    db_name: db
+
+  tasks:
+    - name: Create a network
+      docker_network:
+        name: "{{docker_network}}"
+    - name: Launch database container
+      docker_container:
+        name: "{{ db_name }}"
+        image: mysql:5.7
+        volumes:
+          - "{{ docker_volume }}:/var/lib/mysql:rw"
+        restart: true
+        networks:
+        - name: "{{ docker_network }}"
+        env:
+          MYSQL_ROOT_PASSWORD: "1"
+          MYSQL_DATABASE: ansible_db
+          MYSQL_USER: ansible
+          MYSQL_PASSWORD: "1"
